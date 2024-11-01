@@ -1,0 +1,110 @@
+#INSERT DATA KE DATABASE JAVA NETBEANS ANT
+
+import java.sql.*;
+import javax.swing.*;
+
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {      
+
+
+    //INSERT DATA KE DATABASE
+
+    Connection con;
+    PreparedStatement pstmt;
+    ResultSet rs;
+    try {
+        //koneksikan ke database penjualan game digital
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/jualgamenjir", "root", "");
+                
+        //set query insert data                               1            2             3            4            5
+        String queryInputGame = "INSERT INTO `tabelgame` (`id_game`, `nama_game`, `nama_publisher`, `harga`, `tanggal_publish`) VALUES (?, ?, ?, ?, ?)";
+        pstmt = con.prepareStatement(queryInputGame);   
+                
+        //input value ke query "?" nya (tiap ? ada angkanya, ? pertama artinya 1)
+        pstmt.setString(1, "TEKS VALUE 1");
+        pstmt.setString(2, "TEKS VALUE 2");
+        pstmt.setString(3, "TEKS VALUE 3");
+        pstmt.setString(4, "TEKS VALUE 4");
+        pstmt.setString(5, "TEKS VALUE 5");
+        pstmt.executeUpdate();
+                
+        JOptionPane.showMessageDialog(this, "DATA DI INPUTKAN!", "JIR BISA", JOptionPane.INFORMATION_MESSAGE);
+    }
+    catch(SQLException ex) {
+        JOptionPane.showMessageDialog(this, ex, "SISTEM WARNING", JOptionPane.WARNING_MESSAGE);
+    }
+
+
+
+    //SELECT DATA FROM DATABASE
+
+    Connection con;
+    PreparedStatement pstmt;
+    ResultSet rs;
+    Integer idGame = 0;
+            
+    try {
+        //koneksikan database
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/jualgamenjir", "root", "");
+        
+        //query select field
+        String queryInputGame = "SELECT `id_game` FROM `tabelgame` ORDER BY `id_game` DESC LIMIT 1";
+        pstmt = con.prepareStatement(queryInputGame);
+        rs = pstmt.executeQuery();
+
+        //jika ada data
+        if(rs.next()) {
+            //variable idGame = field id_game
+            idGame = Integer.parseInt(rs.getString("id_game"));
+        }
+    }
+    catch(SQLException ex) {
+        JOptionPane.showMessageDialog(this, ex, "SISTEM WARNING", JOptionPane.WARNING_MESSAGE);
+    }
+
+
+
+    //SELECT * FROM DATABASE TAMPILKAN KE JTABLE
+
+    Connection con;
+    PreparedStatement pstmt;
+    ResultSet rs;
+
+    try {
+        //koneksikan database
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/jualgamenjir", "root", "");
+
+        //query select field
+        String queryInputGame = "SELECT * FROM `tabelgame`";
+        pstmt = con.prepareStatement(queryInputGame);
+        rs = pstmt.executeQuery();
+
+        //siapkan tabel
+        DefaultTableModel  model = (DefaultTableModel) tabelData.getModel();
+
+        //mulai dari baris ke 0
+        model.setRowCount(0);
+
+        //ambil semua data yang di dapatkan
+        while(rs.next()) {
+            //formatnya : var idgame di ambil dari rs.getString("id_game") "id_game" berasal dari field di database
+            String idGame = rs.getString("id_game");
+            String namaGame = rs.getString("nama_game");
+            String namaPublisher = rs.getString("nama_publisher");
+            String hargaGame = rs.getString("harga");
+            String tanggalPublish = rs.getString("tanggal_publish");
+            String jumlahBeli = rs.getString("jumlahBeli");
+
+            //tampilkan semua data yang di dapatkan ke tabel (buat row baru tiap baris data)
+            model.addRow(new Object[]{idGame, namaGame, namaPublisher, hargaGame, tanggalPublish, jumlahBeli});
+        }
+        //tutup koneksi, agar tidak boros quota
+        rs.close();
+        pstmt.close();
+    }
+    catch(SQLException ex) {
+        JOptionPane.showMessageDialog(this, ex, "SISTEM WARNING", JOptionPane.WARNING_MESSAGE);
+    }
+
+
+
+}
